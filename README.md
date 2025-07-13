@@ -19,8 +19,8 @@ Staff: Can view and update stock
 
 Product Management
 Add, edit, delete products
-Product fields: name SKU, category, quantity, price, supplier, expiry, image
-Filter/sort by category, name, stock level
+Product fields: name SKU, department, quantity, price, supplier, expiry, image
+Filter/sort by department, name, stock level
 Stock Alerts
 Admins are alerted when stock falls below threshold
 Staff can check if product is in stock
