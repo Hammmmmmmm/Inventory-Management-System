@@ -19,7 +19,7 @@ Staff: Can view and update stock
 
 Product Management
 Add, edit, delete products
-Product fields: name SKU, department, quantity, price, supplier, expiry, image
+Product fields: name SKU, department, quantity, price, supplier, expiry
 Filter/sort by department, name, stock level
 Stock Alerts
 Admins are alerted when stock falls below threshold
@@ -44,7 +44,7 @@ The database will be handled using SQLite and will store the systems Users, Prod
 The Tables should follow these prototypes:
 
 users: (id, username, password_hash, role)
-products: (id, name, sku, quantity, category, supplier_id, price, expiry_date, image_path)
+products: (id, name, sku, quantity, category, supplier_id, price, expiry_date)
 suppliers: (id, name, contact_email, phone, address)
 stock_logs: (id, product_id, user_id, change, timestamp, reason)
 
