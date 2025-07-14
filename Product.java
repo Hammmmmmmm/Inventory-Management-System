@@ -9,7 +9,6 @@ public class Product {
     private float price;
     private LocalDateTime expiry;
 
-
     public enum Department {
         PRODUCE,
         MEAT,

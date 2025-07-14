@@ -19,7 +19,7 @@ public abstract class User {
     public int getID() { return id; }
     public String getUserName() { return userName; }
     public String getPasswordHash() { return passwordHash; }
-    public Role getUserRole() { return userRole; }
+    protected Role getUserRole() { return userRole; }
     public String toString() {
         return getID() + ", " + getUserName()  + ", " + getPasswordHash() + ", " + getUserRole().name();
     }
