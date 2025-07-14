@@ -56,3 +56,28 @@ Libraries:
 Apache PDFBox or iText for PDF exports
 ControlsFX or JFoenix for better UI elements
 BCrypt for password hashing
+
+UI Concept Design:
+
+Login Screen 
+Consists of two text entries for input of the users userName and password and a login button 
+to login using entered credentials. The password entry should replace all characters with * to
+hide the password the user is entering.
+
+Given a correct combination of userName and password the user will be prompted with the applications main menu.
+
+Main Menu
+All primary functions of the application should be accessible from this menu, but accessible functions should 
+depend on the users permissions which are based on their role. The following features should be available to their 
+respective roles.
+
+Admin
+Searching for specific products based on department, name, stock level
+Add, edit, delete products
+
+
+
+Staff
+Searching for specific products based on department, name, stock level
+Add, delete products
+
