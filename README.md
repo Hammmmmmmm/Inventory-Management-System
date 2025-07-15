@@ -74,10 +74,12 @@ respective roles.
 Admin
 Searching for specific products based on department, name, stock level
 Add, edit, delete products
-
+Add new Suppliers
+Link suppliers with their products
 
 
 Staff
 Searching for specific products based on department, name, stock level
+View if specific products are in stock
 Add, delete products
 
