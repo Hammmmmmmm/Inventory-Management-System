@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="DashboardController"
+            prefWidth="600" prefHeight="400">
+
+    <top>
+        <Label text="Welcome to the Dashboard"
+               style="-fx-font-size: 20px; -fx-font-weight: bold;"
+               BorderPane.alignment="CENTER"
+               padding="10" />
+    </top>
+
+    <center>
+        <VBox alignment="CENTER" spacing="15">
+            <Button text="Profile" />
+            <Button text="Settings" />
+            <Button text="Logout" onAction="#handleLogout" />
+        </VBox>
+    </center>
+
+</BorderPane>
