@@ -1,5 +1,8 @@
+import javax.security.auth.login.LoginException;
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLClientInfoException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -18,14 +21,18 @@ public class Main{
      * Initial code execute on program start
      * Opens the login window
      */
-    private void start() {
+    private void start(){
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(600, 400);
         mainFrame.setLocationRelativeTo(null);
 
-        registerScreen("login", LoginScreen::new);
-        registerScreen("dashboard", DashboardScreen::new);
-        registerScreen("settings", SettingsScreen::new);
+        try {
+            registerScreen("login", LoginScreen::new);
+            registerScreen("dashboard", DashboardScreen::new);
+        } catch (Exception ex) {
+            throw new ScreenRegistrationException(ex);
+        }
+        
 
         showScreen("login");
 

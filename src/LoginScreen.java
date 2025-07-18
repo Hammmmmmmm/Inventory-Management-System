@@ -12,7 +12,7 @@ import java.util.Optional;
 
 
 public class LoginScreen extends JPanel{
-    public LoginScreen() throws SQLException, Exception{
+    public LoginScreen(){
         setLayout(new BorderLayout());
 
         JPanel form = new JPanel(new GridLayout(3, 2));
@@ -30,13 +30,18 @@ public class LoginScreen extends JPanel{
         add(form, BorderLayout.CENTER);
 
         loginButton.addActionListener(e -> {
-            Optional<String> hashedPassword = DataBase.getHashedPassword(userField.getText());
-            if (hashedPassword.isPresent() && BCrypt.checkpw(userField.getText(), hashedPassword.get())) {
-                Main.getInstance().showScreen("dashboard");
-            } else {
-                int i;
-                // TODO Display password or username not correct
+            try {
+                Optional<String> hashedPassword = DataBase.getHashedPassword(userField.getText());
+                if (hashedPassword.isPresent() && BCrypt.checkpw(userField.getText(), hashedPassword.get())) {
+                    Main.getInstance().showScreen("dashboard");
+                } else {
+                    int i;
+                    // TODO Display password or username not correct
+                }
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             }
+            
             
         });
     }
