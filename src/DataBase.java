@@ -9,7 +9,7 @@ public class DataBase {
     private static final String URL;
 
     static {
-        String projectRoot = System.getProperty("user.dir");
+        String projectRoot = System.getProperty("users.dir");
         String dbPath = projectRoot + "\\lib\\other\\users.db";
         URL = "jdbc:sqlite:" + dbPath;
     }
@@ -35,7 +35,7 @@ public class DataBase {
     }}
 
     public static Optional<String> getHashedPassword(String userName) throws SQLException, Exception{
-        String sql = "SELECT password FROM user WHERE username = ?";
+        String sql = "SELECT password FROM users WHERE username = ?";
         Connection conn = connect(); 
         PreparedStatement stmt = conn.prepareStatement(sql);
 

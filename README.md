@@ -49,7 +49,7 @@ suppliers: (id, name, contact_email, phone, address)
 stock_logs: (id, product_id, user_id, change, timestamp, reason)
 
 Tech Stack: 
-UI: JavaFX
+UI: Swing
 Backend: Java 23
 DB: SQLite
 Libraries:
