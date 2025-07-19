@@ -1,3 +1,4 @@
+package Exceptions;
 public class ScreenRegistrationException extends RuntimeException {
     public ScreenRegistrationException(String message) {
         super(message);

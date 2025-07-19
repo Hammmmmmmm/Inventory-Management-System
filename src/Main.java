@@ -1,13 +1,13 @@
-import javax.security.auth.login.LoginException;
 import javax.swing.*;
+
+import Exceptions.ScreenRegistrationException;
+
 import java.awt.*;
-import java.sql.SQLClientInfoException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 public class Main{
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         DataBase.createUsersTable();
         SwingUtilities.invokeLater(() -> new Main().start());
     }
