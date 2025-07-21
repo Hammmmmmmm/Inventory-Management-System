@@ -17,7 +17,7 @@ public abstract class User {
     }
 
     public int getID() { return id; }
-    public String getUserName() { return userName; }
+    public String getUsername() { return userName; }
     public String getPasswordHash() { return passwordHash; }
     protected Role getUserRole() { return userRole; }
     public String toString() {

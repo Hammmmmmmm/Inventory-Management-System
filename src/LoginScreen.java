@@ -29,9 +29,7 @@ public class LoginScreen extends JPanel{
 
         loginButton.addActionListener(e -> {
             try {
-                Optional<String> hashedPassword = DataBase.getHashedPassword(userField.getText());
-                if (hashedPassword.isPresent() && BCrypt.checkpw(userField.getText(), hashedPassword.get())) {
-                    Main.getInstance().showScreen("dashboard");
+                Authorizer.login(null);
                 } else {
                     int i;
                     // TODO Display password or username not correct

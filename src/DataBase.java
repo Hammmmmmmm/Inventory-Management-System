@@ -37,7 +37,7 @@ public class DataBase {
      * already present
      */
     public static void createUsersTable() throws Exception{
-        String sql = "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT)";
+        String sql = "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT, role TEXT)";
         Connection conn = connect(); 
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.execute();
@@ -56,9 +56,19 @@ public class DataBase {
         return Optional.ofNullable(null);
     }
     
-    public static void insertUser(User user) {
-        //TODO Insert user into database Then by default add Admin as a permanent user
+    public final static void insertUser(User user) throws Exception {
+    String sql = "INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)";
+    try (Connection conn = connect();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, user.getUsername());
+        stmt.setString(2, user.getPasswordHash());
+        assert user.getUserRole() != User.Role.ADMIN;
+        stmt.setString(3, );
+        stmt.executeUpdate();
+    } catch(AssertionError as) {
+        // TODO Display incorrect permissions
     }
+}
 
 }
     
