@@ -1,28 +1,56 @@
 import java.sql.SQLException;
 import java.util.Optional;
 
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-
 import org.mindrot.jbcrypt.BCrypt;
 
-import Exceptions.MultipleUserLoginException;
+import Exceptions.DataBaseConnectionException;
 
 public final class Authorizer {
+    public enum LoginResult {
+        SUCCESS,
+        USER_NOT_FOUND,
+        WRONG_PASSWORD
+    }
+
     private static Optional<User> currentUser;
 
     public static Optional<User> getCurrentUser() {return currentUser;}
-    public static void login(User user) throws MultipleUserLoginException{
-        if (!currentUser.isPresent()) throw new MultipleUserLoginException(
-            "Multiple Users attempted to login a the same time");
-        if (authorizeLoginCredentials(, null))
+
+    /**
+     * Handles Login logic
+     * @param user User object, only uses username and passwordHash
+     * @throws MultipleUserLoginException
+     */
+    public static LoginResult tryLogin(User user) throws SQLException, DataBaseConnectionException{
+        LoginResult result = checkLoginCredentials(user);
+        if (result == LoginResult.SUCCESS) login(user);
+
+        return result;
+
     }
 
-    private static boolean authorizeLoginCredentials(User inputtedUser) throws SQLException{
+    private static void login(User user) {
+        
+            
+    }
+
+    /**
+     * Checks Inputted User against DataBase
+     * @param inputtedUser
+     * @return True if Credentials are correct 
+     * @throws MultipleUserLoginException
+     * @throws SQLException
+     * @throws DataBaseConnectionException
+     */
+    private static LoginResult checkLoginCredentials(User inputtedUser) throws SQLException, DataBaseConnectionException{
         Optional<String> hashedPassword = DataBase.getHashedPassword(inputtedUser.getUsername());
+        if (!currentUser.isPresent()) return LoginResult.USER_NOT_FOUND;
         if (hashedPassword.isPresent() && BCrypt.checkpw(inputtedUser.getUsername(), hashedPassword.get())) {
-            return true;
-        }
-        return false;
+            return LoginResult.SUCCESS;
+        } 
+        
+        return LoginResult.WRONG_PASSWORD;
+            
+        
     }
 }
