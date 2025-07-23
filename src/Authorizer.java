@@ -26,7 +26,6 @@ public final class Authorizer {
         if (result == LoginResult.SUCCESS) login(user);
 
         return result;
-
     }
 
     private static void login(User user) {

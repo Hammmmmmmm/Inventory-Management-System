@@ -10,6 +10,8 @@ import java.util.Optional;
 
 
 public class LoginScreen extends JPanel{
+    private final CurrentLoginState state = new CurrentLoginState();
+
     public LoginScreen(){
         setLayout(new BorderLayout());
 
@@ -29,10 +31,9 @@ public class LoginScreen extends JPanel{
 
         loginButton.addActionListener(e -> {
             try {
-                Authorizer.login(null);
-                } else {
-                    int i;
-                    // TODO Display password or username not correct
+                    state.attemptLogin(userField.getText(), passField.getPassword().toString());
+
+                    
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);

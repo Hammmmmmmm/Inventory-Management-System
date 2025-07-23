@@ -6,6 +6,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+
+//TODO Conider the state pattern without using enum to simplify code 
 public class Main{
     public static void main(String[] args) throws Exception{
         DataBase.createUsersTable();

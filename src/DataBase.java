@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import Exceptions.DataBaseConnectionException;
 import Exceptions.InsufficientPermissionsException;
 import Exceptions.UserNotLoggedInException;
@@ -92,7 +94,24 @@ public class DataBase {
 
         stmt.setString(3, );
         stmt.executeUpdate();
+    }
+
+    /**
+     * Checks Inputted User against DataBase
+     * @param inputtedUser
+     * @return True if Credentials are correct 
+     * @throws MultipleUserLoginException
+     * @throws SQLException
+     * @throws DataBaseConnectionException
+     */
+    private static boolean checkLoginCredentials(CurrentLoginState currentLoginState, String username, String password) throws SQLException, DataBaseConnectionException{
+        Optional<String> hashedPassword = DataBase.getHashedPassword(inputtedUser.getUsername());
+        if (currentLoginState.getClass() == LoggedInState.class) return false;
+        if (hashedPassword.isPresent() && BCrypt.checkpw(inputtedUser.getUsername(), hashedPassword.get())) {
+            return true; // Credentials correct
+        } 
         
+        return false;
     }
 
 }
