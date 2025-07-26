@@ -13,17 +13,12 @@ import Exceptions.UserNotLoggedInException;
 
 public class DataBase {
     private static final String URL = "jdbc:sqlite:lib/other/users.db";
-
-    
-
     /**
      * Creates a live connection to the databases
      * @return a valid SQL Connection
      * @throws DataBaseConnectionException if the connection fails
      */
     public static Connection connect() throws DataBaseConnectionException{
-        
-
         try {
             Class.forName("org.sqlite.JDBC"); // Checks if driver present
             return DriverManager.getConnection(URL);
@@ -99,16 +94,16 @@ public class DataBase {
     /**
      * Checks Inputted User against DataBase
      * @param inputtedUser
-     * @return True if Credentials are correct 
+     * @return True if Credentials are correct
      * @throws MultipleUserLoginException
      * @throws SQLException
      * @throws DataBaseConnectionException
      */
-    private static boolean checkLoginCredentials(CurrentLoginState currentLoginState, String username, String password) throws SQLException, DataBaseConnectionException{
-        Optional<String> hashedPassword = DataBase.getHashedPassword(inputtedUser.getUsername());
-        if (currentLoginState.getClass() == LoggedInState.class) return false;
-        if (hashedPassword.isPresent() && BCrypt.checkpw(inputtedUser.getUsername(), hashedPassword.get())) {
-            return true; // Credentials correct
+    public static boolean checkLoginCredentials(String username, String password) throws SQLException, DataBaseConnectionException{
+        Optional<String> hashedPassword = DataBase.getHashedPassword(username);
+        if (hashedPassword.isPresent() && 
+            BCrypt.checkpw(username, hashedPassword.get())) {
+                return true; // Credentials correct
         } 
         
         return false;
