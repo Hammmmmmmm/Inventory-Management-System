@@ -69,15 +69,15 @@ public class DataBase {
      * @throws InsufficientPermissionsException 
      */
     public final static void insertUser(User user) throws InsufficientPermissionsException, UserNotLoggedInException{
-        if (!Authorizer.getCurrentUser().isPresent()) throw new UserNotLoggedInException("No user has been logged in? (Should be unreachable)");
-        if (Authorizer.getCurrentUser().get().getUserRole() != User.Role.ADMIN) 
+        if (!LoginScreen.getCurrentUser().isPresent()) throw new UserNotLoggedInException("No user has been logged in? (Should be unreachable)");
+        if (LoginScreen.getCurrentUser().get().getUserRole() != User.Role.ADMIN) 
             {
             throw new InsufficientPermissionsException(
                 "Attempting to insert new User with insufficient permissions," +
                 "Your permission level was " + user.getUserRole().name()
             );
         }
-        User currentLoggedInUser = Authorizer.getCurrentUser().get();
+        User currentLoggedInUser = LoginScreen.getCurrentUser().get();
         String sql = "INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)";
         Connection conn = connect();
         PreparedStatement stmt = conn.prepareStatement(sql)
@@ -86,9 +86,11 @@ public class DataBase {
         stmt.setString(2, user.getPasswordHash());
 
         
-
+        // TODO 
+        /* 
         stmt.setString(3, );
         stmt.executeUpdate();
+        */
     }
 
     /**

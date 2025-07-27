@@ -21,6 +21,6 @@ public abstract class User {
     public String getPasswordHash() { return passwordHash; }
     protected Role getUserRole() { return userRole; }
     public String toString() {
-        return getID() + ", " + getUserName()  + ", " + getPasswordHash() + ", " + getUserRole().name();
+        return getID() + ", " + getUsername()  + ", " + getPasswordHash() + ", " + getUserRole().name();
     }
 }
