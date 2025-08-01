@@ -68,7 +68,7 @@ public class DataBase {
      * @throws UserNotLoggedInException
      * @throws InsufficientPermissionsException 
      */
-    public final static void insertUser(User user) throws InsufficientPermissionsException, UserNotLoggedInException{
+    public final static void insertUser(User user) throws DataBaseConnectionException, InsufficientPermissionsException, UserNotLoggedInException{
         if (!LoginScreen.getCurrentUser().isPresent()) throw new UserNotLoggedInException("No user has been logged in? (Should be unreachable)");
         if (LoginScreen.getCurrentUser().get().getUserRole() != User.Role.ADMIN) 
             {
@@ -78,38 +78,21 @@ public class DataBase {
             );
         }
         User currentLoggedInUser = LoginScreen.getCurrentUser().get();
-        String sql = "INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)";
         Connection conn = connect();
-        PreparedStatement stmt = conn.prepareStatement(sql)
+        try {
+            String sql = "INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)";    
+            PreparedStatement stmt = conn.prepareStatement(sql);
         
-        stmt.setString(1, user.getUsername());
-        stmt.setString(2, user.getPasswordHash());
-
-        
-        // TODO 
-        /* 
-        stmt.setString(3, );
-        stmt.executeUpdate();
-        */
+            stmt.setString(1, user.getUsername());
+            stmt.setString(2, user.getPasswordHash());
+            stmt.setString(3, user.getPasswordHash());
+            stmt.executeUpdate();
+        } catch (SQLException e){
+            //TODO propigate more appropriate error
+        }
     }
 
-    /**
-     * Checks Inputted User against DataBase
-     * @param inputtedUser
-     * @return True if Credentials are correct
-     * @throws MultipleUserLoginException
-     * @throws SQLException
-     * @throws DataBaseConnectionException
-     */
-    public static boolean checkLoginCredentials(String username, String password) throws SQLException, DataBaseConnectionException{
-        Optional<String> hashedPassword = DataBase.getHashedPassword(username);
-        if (hashedPassword.isPresent() && 
-            BCrypt.checkpw(username, hashedPassword.get())) {
-                return true; // Credentials correct
-        } 
-        
-        return false;
-    }
+    
 
 }
     

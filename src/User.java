@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public abstract class User {
     private final int id;
     private final String userName;
@@ -11,9 +13,9 @@ public abstract class User {
 
     protected User(int id, String userName, String passwordHash, Role userRole) {
         this.id = id;
-        this.userName = userName;
-        this.passwordHash = passwordHash;
-        this.userRole = userRole;
+        this.userName = Objects.requireNonNull(userName, "UserName cannot be null");
+        this.passwordHash = Objects.requireNonNull(passwordHash, "Password cannot be null");
+        this.userRole = Objects.requireNonNull(userRole);
     }
 
     public int getID() { return id; }
