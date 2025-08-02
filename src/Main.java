@@ -7,7 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class Main{
+interface ScreenNavigator {
+    void showScreen(String name);
+}
+
+public class Main implements ScreenNavigator{
     public static void main(String[] args) throws Exception{
         DataBase.createUsersTable();
         SwingUtilities.invokeLater(() -> new Main().start());
@@ -17,6 +21,7 @@ public class Main{
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel container = new JPanel(cardLayout);
     private final Map<String, JPanel> screens = new HashMap<>();
+    private final LoginService loginService = new LoginService(new AwaitingCredentialsState());
 
     /**
      * Initial code execute on program start
@@ -28,7 +33,7 @@ public class Main{
         mainFrame.setLocationRelativeTo(null);
 
         try {
-            registerScreen("login", LoginScreen::new);
+            registerScreen("login", () -> new LoginScreen(loginService));
             registerScreen("dashboard", DashboardScreen::new);
         } catch (Exception ex) {
             throw new ScreenRegistrationException(ex);
@@ -50,15 +55,19 @@ public class Main{
         cardLayout.show(container, name);
     }
 
-    // Screens can call this to request navigation
-    public static Main getInstance() {
-        return instance;
+    public LoginService getLoginService(){
+        return this.loginService;
     }
 
-    private static Main instance;
+    // Screens can call this to request navigation
+    public static ScreenNavigator getScreenNavigator() {
+        return Main.screenNavigator;
+    }
+
+    private static ScreenNavigator screenNavigator;
 
     public Main() {
-        instance = this;
+        Main.screenNavigator = this;
     }
 
     

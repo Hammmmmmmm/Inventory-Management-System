@@ -21,6 +21,11 @@ public class LoginService {
         this.loginState = newState;
     }
 
+    public User getCurrentUser() throws UserNotLoggedInException{
+        if (!currentLoggedInUser.isPresent()) throw new UserNotLoggedInException("Tried to get User when no user is logged in");
+        return currentLoggedInUser.get();
+    }
+
     public boolean attemptLogin(
         String username, 
         String password
@@ -32,10 +37,7 @@ public class LoginService {
         return this.loginState.handleLogin(this, username, password);
     }
 
-    public User getCurrentUser() throws UserNotLoggedInException{
-        if (!currentLoggedInUser.isPresent()) throw new UserNotLoggedInException("Tried to get User when no user is logged in");
-        return currentLoggedInUser.get();
-    }
+    
 
     /**
      * Checks Inputted User against DataBase
@@ -117,7 +119,7 @@ class LoggedInState implements LoginState {
         throw new UserAlreadyLoggedInException(
             "User: " + username + 
             " tried to login while User: " + 
-            state.getCurrentUser().getUsername() + 
+            loginService.getCurrentUser().getUsername() + 
             " is already logged in."
         );
     }
