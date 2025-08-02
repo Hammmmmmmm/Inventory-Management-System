@@ -9,7 +9,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import Exceptions.DataBaseConnectionException;
 import Exceptions.UserAlreadyLoggedInException;
-import LoginService.LoginResult;
+import Exceptions.UserNotLoggedInException;
 
 import java.awt.*;
 import java.sql.SQLException;
@@ -17,10 +17,8 @@ import java.util.Optional;
 
 
 public class LoginScreen extends JPanel{
-    private final LoginState state;
-    public void setState(LoginState state) {this.state = state;}
+    private LoginService loginService = new LoginService();
     public LoginScreen(LoginService loginService){
-        this.state = new AwaitingCredentialsState();
         setLayout(new BorderLayout());
 
         JPanel form = new JPanel(new GridLayout(3, 2));
@@ -41,7 +39,7 @@ public class LoginScreen extends JPanel{
             try {
                 String username = userField.getText();
                 String password = new String(passField.getPassword());
-                boolean res = state.attemptLogin(username, password);
+                boolean res = login.attemptLogin(username, password);
                 if (res) {
                     // TODO: switch to dashboard
                 } else {
@@ -55,53 +53,95 @@ public class LoginScreen extends JPanel{
 }
 
 interface LoginState {
-    boolean handleLogin(CurrentLoginState state, String username, String rawPassword) throws SQLException, UserAlreadyLoggedInException, DataBaseConnectionException;
+    boolean handleLogin(
+        CurrentLoginState state, 
+        String username, 
+        String rawPassword
+    ) throws SQLException, 
+             UserAlreadyLoggedInException, 
+             DataBaseConnectionException, 
+             UserNotLoggedInException;
+
     void handleLogout(CurrentLoginState state);
 }
 
 class AwaitingCredentialsState implements LoginState {
-    public boolean handleLogin(CurrentLoginState state, String username, String rawPassword) throws SQLException, UserAlreadyLoggedInException, DataBaseConnectionException{
-       boolean res = LoginService.checkLoginCredentials(username, rawPassword);
-       if (res) state.setState(new LoggedInState());
-       return res;
+    @Override
+    public boolean handleLogin(
+        CurrentLoginState state, 
+        String username, 
+        String rawPassword
+    ) throws SQLException, 
+             UserAlreadyLoggedInException, 
+             DataBaseConnectionException 
+    {
+        boolean success = LoginService.checkLoginCredentials(username, rawPassword);
+        if (success) {
+            state.setState(new LoggedInState());
+        }
+        return success;
     }
+
+    @Override
     public void handleLogout(CurrentLoginState state) {
-        // TODO throw usefull exception
+        // TODO: throw meaningful exception
+    }
 }
 
 class LoggedInState implements LoginState {
-    public boolean handleLogin(CurrentLoginState cls, String username, String password) throws SQLException, UserAlreadyLoggedInException, DataBaseConnectionException{
-        JOptionPane.showMessageDialog(null, "Cannot login, your already logged in", 
-            "OK", JOptionPane.INFORMATION_MESSAGE);
+    @Override
+    public boolean handleLogin(
+        CurrentLoginState state, 
+        String username, 
+        String password
+    ) throws SQLException, 
+             UserAlreadyLoggedInException, 
+             DataBaseConnectionException, 
+             UserNotLoggedInException 
+    {
+        JOptionPane.showMessageDialog(
+            null, 
+            "Cannot login, you're already logged in.", 
+            "OK", 
+            JOptionPane.INFORMATION_MESSAGE
+        );
+
         throw new UserAlreadyLoggedInException(
-            "User: " + username + "tried to login when User: " + 
-            LoginService.getCurrentUser().getUsername());
+            "User: " + username + 
+            " tried to login while User: " + 
+            LoginService.getCurrentUser().getUsername() + 
+            " is already logged in."
+        );
     }
 
+    @Override
     public void handleLogout(CurrentLoginState state) {
         LoginService.logout();
-        this.state = new AwaitingCredentialsState();
-    } 
+        state.setState(new AwaitingCredentialsState());
+    }
 }
 
 class CurrentLoginState {
-    private LoginState state = new AwaitingCredentialsState();
+    private LoginState state;
 
-    CurrentLoginState() {
-        
+    public CurrentLoginState() {
+        this.state = new AwaitingCredentialsState();
     }
 
-    public void setState(LoginState state) {this.state = state;}
-    public boolean attemptLogin(String username, String password) {
-        try {
-            return state.handleLogin(this, username, password);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Login failed: " + ex.getMessage());
-            return false;
-        }
-        
+    public void setState(LoginState newState) {
+        this.state = newState;
     }
-    
+
+    public boolean attemptLogin(
+        String username, 
+        String password
+    ) throws SQLException, 
+             UserAlreadyLoggedInException, 
+             DataBaseConnectionException, 
+             UserNotLoggedInException
+    {
+        return state.handleLogin(this, username, password);
+    }
 }
 
 
