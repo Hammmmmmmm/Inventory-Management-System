@@ -1,8 +1,10 @@
+import java.lang.foreign.Linker.Option;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.DateTimeException;
 import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -11,45 +13,142 @@ import Exceptions.DataBaseConnectionException;
 import Exceptions.InsufficientPermissionsException;
 import Exceptions.UserNotLoggedInException;
 
-public class DataBase {
-    private static final String URL = "jdbc:sqlite:lib/other/users.db";
+interface DatabaseConnection {
+    Connection getConnection() throws DataBaseConnectionException;
+    void closeConnection(Connection conn);
+}
+
+class SQLiteDataBaseConnection implements DatabaseConnection {
+    //private static final String URL = "jdbc:sqlite:lib/other/users.db";
+    private final String url;
+    
+    public SQLiteDataBaseConnection(String url) {
+        this.url = url;
+    }
     /**
      * Creates a live connection to the databases
      * @return a valid SQL Connection
      * @throws DataBaseConnectionException if the connection fails
      */
-    public static Connection connect() throws DataBaseConnectionException{
+    @Override
+    public Connection getConnection() throws DataBaseConnectionException {
         try {
             Class.forName("org.sqlite.JDBC"); // Checks if driver present
-            return DriverManager.getConnection(URL);
+            return DriverManager.getConnection(url);
         } catch (ClassNotFoundException ex) {
             throw new DataBaseConnectionException("SQLite JDBC driver not found", ex);
         
         } catch (Exception ex) {
-            throw new DataBaseConnectionException("Failed to connect to DB at: " + URL, ex);
+            throw new DataBaseConnectionException("Failed to connect to DB at: " + url, ex);
         }
-        
     }
 
+    @Override
+    public void closeConnection(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing connection: " + e.getMessage());
+            }
+        }
+    }
+}
+
+interface UserRepository {
+    void createUsersTable() throws Exception;
+    Optional<String> getHashedPassword(String userName) throws SQLException, DataBaseConnectionException;
+    void insertUser(User user) throws DataBaseConnectionException, InsufficientPermissionsException, UserNotLoggedInException;
+    Optional<User> findByUsername(String username) throws DataBaseConnectionException;
+    boolean userExists(String username) throws DataBaseConnectionException;
+}
+
+
+interface userService {
+    void createUser(User user) throws InsufficientPermissionsException, UserNotLoggedInException, DataBaseConnectionException;
+    boolean authenticateUser(String username, String password) throws DataBaseConnectionException;
+}
+
+class DataBaseUserRepositiory implements UserRepository {
+    private final DatabaseConnection dbConnection;
+    
+    public DatabaseUserRepository(DatabaseConnection dbConnection) {
+        this.dbConnection = dbConnection;
+    }
     /**
      * Initially creates the UserLoginTable if its not
      * already present
      * @throws Exception
      */
-    public static void createUsersTable() throws Exception{
+    @Override
+    public void createUsersTable() throws DataBaseConnectionException{
         String sql = "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT, role TEXT)";
-        Connection conn = connect(); 
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.execute();
-        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            conn = dbConnection.getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.execute();
+        } catch (SQLException ex) {
+            throw new DataBaseConnectionException("Failed to create users table", ex);
+        } finally {
+            //TODO close database connection and release resources
+        }
     }
+
     /**
      * Gets the Password Hash of a given user by their Username
-     * @param userName The Username of the user of which Hash is to be returned
+     * @param username The Username of the user of which Hash is to be returned
      * @return Optional containing the Hashed Password 
      * @throws SQLException 
      * @throws DataBaseConnectionException 
      */
+    @Override 
+    public Optional<String> getHashedPassword(String username) throws DataBaseConnectionException{
+        String sql = "SELECT password FROM users WHERE username = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = dbConnection.getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            rs = stmt.executeQuery();
+        } catch (SQLException ex){
+            throw new DataBaseConnectionException("Failed to connect to database", ex);
+        } finally {
+            // TODO release resources
+        }
+
+        
+        if (rs.next()) return Optional.ofNullable(rs.getString("password"));
+
+        return Optional.ofNullable(null);
+    }
+
+    @Override 
+    public void insertUser(User user) throws DataBaseConnectionException{
+        String sql = "INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)";
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = dbConnection.getConnection();
+            stmt = conn.prepareStatement(sql);
+            st
+        }
+    }
+}
+
+
+public class DataBase {
+    
+    
+
+    
+    
     public static Optional<String> getHashedPassword(String userName) throws SQLException, DataBaseConnectionException{
         String sql = "SELECT password FROM users WHERE username = ?";
         Connection conn = connect(); 
