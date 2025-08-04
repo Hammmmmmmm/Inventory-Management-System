@@ -69,12 +69,48 @@ interface userService {
     boolean authenticateUser(String username, String password) throws DataBaseConnectionException;
 }
 
-class DataBaseUserRepositiory implements UserRepository {
+class DataBaseUserRepository implements UserRepository {
     private final DatabaseConnection dbConnection;
     
-    public DatabaseUserRepository(DatabaseConnection dbConnection) {
+    public DataBaseUserRepository(DatabaseConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
+
+    @Override
+    public Optional<User> findByUsername(String username) throws DataBaseConnectionException {
+        String sql = "SELECT username, password, role FROM users WHERE username = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = dbConnection.getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                User.Role role = User.Role.valueOf(rs.getString("role"));
+                return Optional.of(new User(
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    role
+                ));
+            }
+            return Optional.empty();
+
+        } catch (SQLException ex){
+            throw new DataBaseConnectionException("Failed to connect to database", ex);
+        } finally {
+            // TODO release resources
+        }
+
+        
+        if (rs.next()) return Optional.ofNullable(rs.getString("password"));
+
+        return Optional.ofNullable(null);
+    }
+
     /**
      * Initially creates the UserLoginTable if its not
      * already present
@@ -94,6 +130,11 @@ class DataBaseUserRepositiory implements UserRepository {
         } finally {
             //TODO close database connection and release resources
         }
+    }
+
+    @Override 
+    public boolean userExists(String username) throws DataBaseConnectionException{
+        return findByUsername(username).isPresent();
     }
 
     /**
@@ -140,6 +181,17 @@ class DataBaseUserRepositiory implements UserRepository {
             st
         }
     }
+
+    private void closeResources(PreparedStatement stmt, ResultSet rs, Connection conn) {
+        if (rs != null) {
+            try { rs.close(); } catch (SQLException e) { /* TODO log error */ }
+        }
+        if (stmt != null) {
+            try { stmt.close(); } catch (SQLException e) { /* TODO log error */ }
+        }
+        dbConnection.closeConnection(conn);
+
+    }
 }
 
 
@@ -151,7 +203,7 @@ public class DataBase {
     
     public static Optional<String> getHashedPassword(String userName) throws SQLException, DataBaseConnectionException{
         String sql = "SELECT password FROM users WHERE username = ?";
-        Connection conn = connect(); 
+        Connection conn = getConnection(); 
         PreparedStatement stmt = conn.prepareStatement(sql);
 
         stmt.setString(1, userName);

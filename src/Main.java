@@ -13,7 +13,7 @@ interface ScreenNavigator {
 
 public class Main implements ScreenNavigator{
     public static void main(String[] args) throws Exception{
-        DataBase.createUsersTable();
+        //TODO create user table
         SwingUtilities.invokeLater(() -> new Main().start());
     }
 
