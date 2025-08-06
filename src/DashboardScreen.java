@@ -21,7 +21,7 @@ public class DashboardScreen extends JPanel {
 
 
         logoutButton.addActionListener(e ->
-            Main.getInstance().showScreen("login")
+            Main.getScreenNavigator().showScreen("login")
         );
     }
 }

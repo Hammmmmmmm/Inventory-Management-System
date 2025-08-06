@@ -1,11 +1,9 @@
 import java.util.Objects;
 
-public abstract class User {
+public class User {
     private final String username;
     private final String passwordHash;
     private final Role userRole;
-
-    
 
     protected User(String username, String passwordHash, Role userRole) {
         this.username = Objects.requireNonNull(username, "UserName cannot be null");
