@@ -12,12 +12,13 @@ public class DataBaseUserService implements UserService {
     @Override
     public void createUser(User user)
             throws InsufficientPermissionsException, UserNotLoggedInException, DataBaseConnectionException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createUser'");
+        
     }
 
     @Override
     public boolean authenticateUser(String username, String password) throws DataBaseConnectionException {
+        Main main = (Main) Main.getDatabaseHandler();
+        main.showScreen(username);
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'authenticateUser'");
     }

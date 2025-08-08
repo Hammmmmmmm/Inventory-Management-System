@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.mindrot.jbcrypt.BCrypt;
 import Exceptions.DataBaseConnectionException;
 import Exceptions.InsufficientPermissionsException;
+import Exceptions.UserNotLoggedInException;
 
 interface UserRepository {
     void createUsersTable() throws Exception;
@@ -135,10 +136,10 @@ public class DataBaseUserRepository implements UserRepository {
 
     private void closeResources(PreparedStatement stmt, ResultSet rs, Connection conn) {
         if (rs != null) {
-            try { rs.close(); } catch (SQLException e) { /* TODO log error */ }
+            try { rs.close(); } catch (SQLException e) { System.err.println("Error closing connection: " + e.getMessage());}
         }
         if (stmt != null) {
-            try { stmt.close(); } catch (SQLException e) { /* TODO log error */ }
+            try { stmt.close(); } catch (SQLException e) {System.err.println("Error closing connection: " + e.getMessage()); }
         }
         dbConnection.closeConnection(conn);
 

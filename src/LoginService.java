@@ -37,8 +37,6 @@ public class LoginService {
         return this.loginState.handleLogin(this, username, password);
     }
 
-    
-
     /**
      * Checks Inputted User against DataBase
      * @param inputtedUser

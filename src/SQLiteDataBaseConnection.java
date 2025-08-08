@@ -9,7 +9,7 @@ interface DatabaseConnection {
     void closeConnection(Connection conn);
 }
 
-class SQLiteDataBaseConnection implements DatabaseConnection {
+public class SQLiteDataBaseConnection implements DatabaseConnection {
     //private static final String URL = "jdbc:sqlite:lib/other/users.db";
     private final String url;
     
