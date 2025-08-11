@@ -12,7 +12,7 @@ import Exceptions.UserNotLoggedInException;
 public class LoginService {
     private Optional<User> currentLoggedInUser = Optional.empty();
     private LoginState loginState;
-
+    private UserRepository userRepository = Main.getDatabaseHandler().getUserRepository();
     LoginService(LoginState loginState) {
         this.loginState = loginState;
     }
@@ -46,7 +46,7 @@ public class LoginService {
      * @throws DataBaseConnectionException
      */
     public boolean checkLoginCredentials(String username, String password) throws SQLException, DataBaseConnectionException{
-        Optional<String> hashedPassword = DataBase.getHashedPassword(username);
+        Optional<String> hashedPassword = userRepository.getHashedPassword(username);
         if (hashedPassword.isPresent() && 
             BCrypt.checkpw(username, hashedPassword.get())) {
                 return true; // Credentials correct
@@ -70,7 +70,7 @@ interface LoginState {
              DataBaseConnectionException, 
              UserNotLoggedInException;
 
-    void handleLogout(LoginService loginService);
+    void handleLogout(LoginService loginService) throws UserNotLoggedInException;
 }
 
 class AwaitingCredentialsState implements LoginState {
@@ -91,8 +91,8 @@ class AwaitingCredentialsState implements LoginState {
     }
 
     @Override
-    public void handleLogout(LoginService state) {
-        // TODO: throw meaningful exception
+    public void handleLogout(LoginService state) throws UserNotLoggedInException {
+        throw new UserNotLoggedInException("No User is currently logged in"); // Should be unreachable
     }
 }
 

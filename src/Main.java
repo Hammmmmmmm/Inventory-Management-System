@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.xml.crypto.Data;
 
 import Exceptions.ScreenRegistrationException;
 
@@ -8,9 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-interface ScreenNavigator {
-    void showScreen(String name);
-}
+
 
 interface DatabaseHandler {
     UserRepository getUserRepository();
