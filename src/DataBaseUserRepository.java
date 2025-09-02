@@ -15,7 +15,7 @@ import Exceptions.UserNotLoggedInException;
 public class DataBaseUserRepository implements UserRepository {
     private final DatabaseConnection dbConnection;
     
-    public DataBaseUserRepository(DatabaseConnection dbConnection) {
+    public DataBaseUserRepository(DatabaseConnection dbConnFection) {
         this.dbConnection = dbConnection;
     }
 
@@ -105,10 +105,6 @@ public class DataBaseUserRepository implements UserRepository {
         } finally {
             closeResources(stmt, rs, conn);
         }
-
-        
-        
-
         return Optional.ofNullable(null);
     }
 
@@ -118,11 +114,16 @@ public class DataBaseUserRepository implements UserRepository {
         
         Connection conn = null;
         PreparedStatement stmt = null;
+        ResultSet rs = null;
 
         try {
             conn = dbConnection.getConnection();
             stmt = conn.prepareStatement(sql);
-            stmt.execute(sql);
+            rs = stmt.executeQuery();
+        } catch(SQLException ex){
+            throw new DataBaseConnectionException("Failed to connect to database", ex);
+        } finally {
+            closeResources(stmt, rs, conn);
         }
     }
 
@@ -134,6 +135,5 @@ public class DataBaseUserRepository implements UserRepository {
             try { stmt.close(); } catch (SQLException e) {System.err.println("Error closing connection: " + e.getMessage()); }
         }
         dbConnection.closeConnection(conn);
-
     }
 }
